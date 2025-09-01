@@ -1,0 +1,292 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOFTWARE MADE BY 01759513787</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            padding: 20px;
+            color: #151b25;
+            line-height: 1.6;
+        }
+
+        .receipt-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border: none;
+            padding: 20px;
+            border: 1px solid rgb(83, 82, 82);
+        }
+
+        /* Header Section */
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid black;
+            padding-bottom: 15px;
+        }
+
+        .receipt-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .receipt-date {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Customer Info Section */
+        .customer-info {
+            margin-bottom: 30px;
+        }
+
+        .customer-info p {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .customer-info strong {
+            font-weight: bold;
+        }
+
+        /* Table Section */
+        .purchase-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid rgb(39, 38, 38);
+        }
+
+        .purchase-table th {
+            background: white;
+            color: black;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid rgb(83, 82, 82);
+            text-transform: uppercase;
+        }
+
+        .purchase-table td {
+            padding: 10px 12px;
+            border: 1px solid black;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .purchase-table td:nth-child(2),
+        .purchase-table td:nth-child(3),
+        .purchase-table td:nth-child(4),
+        .purchase-table th:nth-child(2),
+        .purchase-table th:nth-child(3),
+        .purchase-table th:nth-child(4) {
+            text-align: right;
+        }
+
+        /* Total Section */
+        .total-section {
+            text-align: right;
+            margin-bottom: 30px;
+            /* border-top: 1px solid rgb(41, 39, 39); */
+            padding-top: 15px;
+        }
+
+        .total-amount {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: 2px solid black;
+            background: white;
+            color: black;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: black;
+            color: white;
+        }
+
+        /* Footer */
+        .receipt-footer {
+            text-align: center;
+            border-top: 1px solid black;
+            padding-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 120px;
+        }
+
+        /* Print Styles - Hide buttons when printing */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+
+            .receipt-container {
+                border: none;
+                padding: 20px;
+            }
+
+            .action-buttons {
+                display: none !important;
+            }
+
+            .btn {
+                display: none !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .purchase-table {
+                font-size: 12px;
+            }
+
+            .purchase-table th,
+            .purchase-table td {
+                padding: 8px 6px;
+            }
+
+            .total-amount {
+                font-size: 18px;
+            }
+        }
+        .r{
+          background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+           
+             border: 1px solid white;
+        }
+        .action-buttons{
+            background: #2c3e50;
+            padding: 16px;
+            border-radius: 4px;
+        }
+        .r1:hover{
+          
+            color: white;
+           background: #3498db;
+          font-size: 18px;
+            border-radius: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div>  <!-- Action Buttons (Hidden during print) -->
+       
+        <div class="action-buttons ">
+           
+            <a href="{% url 'see_buy_all' %}" class="btn btn-back r r1" style="background: none;">Back to Purchases</a>
+             <a href="{% url 'home' %}"  class="btn btn-back r r1"  style="background: none;">Home</a> 
+             <button class="btn btn-print r" style="border: none;" onclick="window.print()">Print Receipt</button>
+        </div>
+    </div>
+    <div class="receipt-container">
+        <!-- Header -->
+      
+
+        <div class="receipt-header">
+            <img src="{% static 'images/ha.PNG' %}" alt="Logo" style="width: 40px; height: 40px;">
+            
+
+            <h1>PURCHASE RECEIPT</h1>
+            <div class="receipt-date">{{ session.created_at|date:"d M Y" }}</div>
+        </div>
+
+        <!-- Customer Information -->
+          
+        <div class="customer-info">
+          
+                
+          
+        <p><strong>SR ELECTRONICS</strong></p>
+            <p><strong>Customer Name:</strong> {{ session.user.name }}</p>
+            <p><strong>Phone Number:</strong> {{ session.user.phone }}</p>
+         
+            
+            
+            
+        </div>
+
+        <!-- Purchase Table -->
+        <div class="table-container">
+            <table class="purchase-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.product_name }}</td>
+                        <td>{{ order.product_price }} Tk.</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.total_price }} Tk. </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Section -->
+        <div class="total-section">
+            <div class="total-amount">
+                Total: {{ total_price }}  Tk.
+            </div>
+        </div>
+
+      
+
+        <!-- Footer -->
+        <div class="receipt-footer">
+            <p>Thanks for your purchase</p>
+            <p>Khan Market, Bogura</p>
+            <p>Call: 01751902395</p>
+        </div>
+    </div>
+</body>
+</html>

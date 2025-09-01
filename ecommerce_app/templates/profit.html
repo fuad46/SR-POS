@@ -1,0 +1,553 @@
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h2>Monthly Summary</h2>
+<table border="1">
+  <tr>
+    <th>Month</th>
+    <th>Year</th>
+    <th>Total Revenue</th>
+    <th>Total Profit</th>
+  </tr>
+  {% for entry in monthly_data %}
+  <tr>
+    <td>{{ entry.month_name }}</td>
+    <td>{{ entry.year }}</td>
+    <td>{{ entry.total_revenue }}</td>
+    <td>{{ entry.total_profit }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</body>
+</html>
+
+ -->
+
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Monthly Summary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 24px 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dashboard-title h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .dashboard-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Profit Chart Section */
+        .profit-chart-container {
+            padding: 32px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 24px;
+        }
+
+        .profit-circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #10b981 0deg,
+                #10b981 var(--profit-angle, 120deg),
+                #e2e8f0 var(--profit-angle, 120deg),
+                #e2e8f0 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .profit-circle::before {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .profit-center {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .profit-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 4px;
+        }
+
+        .profit-label {
+            font-size: 14px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Revenue Section */
+        .revenue-section {
+            padding: 24px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        table th {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        table tr {
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        table tr:hover {
+            background: #f8fafc;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Revenue bars */
+        .revenue-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .revenue-bar-fill {
+            height: 8px;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            border-radius: 4px;
+            min-width: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .revenue-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer-bar 2s infinite;
+        }
+
+        @keyframes shimmer-bar {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Summary Stats */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .profit-stat .stat-value {
+            color: #10b981;
+        }
+
+        .revenue-stat .stat-value {
+            color: #3b82f6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 24px 16px;
+            }
+            
+            .chart-wrapper {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .profit-circle {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .profit-circle::before {
+                width: 140px;
+                height: 140px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .summary-stats {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .dashboard-header {
+                padding: 16px;
+            }
+            
+            table th,
+            table td {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="dashboard-title">
+                <h2>Monthly Summary</h2>
+                             <a class="cart-link" href="javascript:history.back()" 
+    style="text-decoration: none;  color: #125ca5; padding: 4px 8px;">← Go Back</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Profit Chart Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span></span>
+                    Total Profit Overview
+                </h3>
+            </div>
+            <div class="profit-chart-container">
+                <div class="chart-wrapper">
+                    <div class="profit-circle" id="profitCircle">
+                        <div class="profit-center">
+                            <div class="profit-amount" id="totalProfitAmount">0 Tk</div>
+                            <div class="profit-label">Total Profit</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="summary-stats">
+                    <div class="stat-card profit-stat">
+                        <div class="stat-value" id="avgProfit">0 Tk</div>
+                        <div class="stat-label">Avg Monthly</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bestMonth">-</div>
+                        <div class="stat-label">Best Month</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Table Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span></span>
+                    Monthly Revenue Breakdown
+                </h3>
+            </div>
+            <div class="revenue-section">
+                {% if monthly_data %}
+                <div class="table-container">
+                    <table border="1">
+                        <tr>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Total Revenue</th>
+                            <th>Total Profit</th>
+                        </tr>
+                        {% for entry in monthly_data %}
+                        <tr>
+                            <td class="month-cell">{{ entry.month_name }}</td>
+                            <td>{{ entry.year }}</td>
+                            <td class="revenue-cell">
+                                <div class="revenue-bar">
+                                    <span>{{ entry.total_revenue }} Tk</span>
+                                   
+                                </div>
+                            </td>
+                            <td class="profit-cell">{{ entry.total_profit }} Tk</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                
+                <div class="summary-stats">
+                    <div class="stat-card revenue-stat">
+                        <div class="stat-value" id="totalRevenue">0 Tk</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalEntries">{{ monthly_data|length }}</div>
+                        <div class="stat-label">Total Months</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <div class="empty-title">No Data Available</div>
+                    <div class="empty-description">Monthly summary data will appear here once you have transactions.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateDashboardMetrics();
+        });
+
+        function calculateDashboardMetrics() {
+            const profitCells = document.querySelectorAll('.profit-cell');
+            const revenueCells = document.querySelectorAll('.revenue-cell span');
+            
+            let totalProfit = 0;
+            let totalRevenue = 0;
+            let maxProfit = 0;
+            let bestMonth = '';
+            
+            // Calculate totals
+            profitCells.forEach((cell, index) => {
+                const profitValue = parseFloat(cell.textContent.replace('৳', '').replace(',', '')) || 0;
+                const revenueValue = parseFloat(revenueCells[index]?.textContent.replace('৳', '').replace(',', '')) || 0;
+                
+                totalProfit += profitValue;
+                totalRevenue += revenueValue;
+                
+                if (profitValue > maxProfit) {
+                    maxProfit = profitValue;
+                    const monthCell = cell.parentElement.querySelector('.month-cell');
+                    bestMonth = monthCell ? monthCell.textContent : '-';
+                }
+            });
+
+            // Update profit circle
+            const profitPercentage = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+            const profitAngle = (profitPercentage / 100) * 360;
+            
+            const profitCircle = document.getElementById('profitCircle');
+            if (profitCircle) {
+                profitCircle.style.setProperty('--profit-angle', profitAngle + 'deg');
+            }
+
+            // Update dashboard values
+            const totalProfitAmount = document.getElementById('totalProfitAmount');
+            const avgProfitEl = document.getElementById('avgProfit');
+            const bestMonthEl = document.getElementById('bestMonth');
+            const totalRevenueEl = document.getElementById('totalRevenue');
+
+            if (totalProfitAmount) {
+                totalProfitAmount.textContent = '৳' + totalProfit.toLocaleString();
+            }
+            
+            if (avgProfitEl && profitCells.length > 0) {
+                avgProfitEl.textContent = '৳' + (totalProfit / profitCells.length).toLocaleString();
+            }
+            
+            if (bestMonthEl) {
+                bestMonthEl.textContent = bestMonth || '-';
+            }
+            
+            if (totalRevenueEl) {
+                totalRevenueEl.textContent = '৳' + totalRevenue.toLocaleString();
+            }
+
+            // Animate profit circle
+            animateProfitCircle(profitAngle);
+        }
+
+        function animateProfitCircle(targetAngle) {
+            const circle = document.getElementById('profitCircle');
+            if (!circle) return;
+            
+            let currentAngle = 0;
+            const increment = targetAngle / 60; // 60 frames animation
+            
+            function animate() {
+                if (currentAngle < targetAngle) {
+                    currentAngle += increment;
+                    circle.style.setProperty('--profit-angle', currentAngle + 'deg');
+                    requestAnimationFrame(animate);
+                } else {
+                    circle.style.setProperty('--profit-angle', targetAngle + 'deg');
+                }
+            }
+            
+            animate();
+        }
+
+        // Add interactive hover effects
+        const tableRows = document.querySelectorAll('table tr:not(:first-child)');
+        tableRows.forEach((row, index) => {
+            row.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(4px)';
+                this.style.boxShadow = '4px 0 0 #3b82f6';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

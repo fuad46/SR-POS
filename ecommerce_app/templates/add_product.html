@@ -1,0 +1,490 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: float-particles 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-particles {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(-10px) rotate(240deg); }
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-header h2 {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .form-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 0 0 4px rgba(255, 255, 255, 0.2),
+                0 8px 32px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+            font-weight: 400;
+        }
+
+        /* File input styling */
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px dashed rgba(102, 126, 234, 0.5);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(102, 126, 234, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .file-icon {
+            font-size: 20px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 50%, #ff4757 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 8px 32px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+
+        .submit-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(255, 107, 107, 0.4);
+        }
+
+        .submit-button:active {
+            transform: translateY(-2px);
+        }
+
+        .product-info {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .product-info p {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Input icons */
+        .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #666;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus + .input-icon {
+            color: #667eea;
+        }
+
+        /* Responsive design */
+        @media (max-width: 580px) {
+            .form-container {
+                padding: 32px 24px;
+                margin: 16px;
+                border-radius: 20px;
+            }
+            
+            .form-header h2 {
+                font-size: 28px;
+            }
+            
+            .form-input, .file-input-label {
+                padding: 14px 18px;
+            }
+            
+            .submit-button {
+                padding: 16px;
+                font-size: 16px;
+            }
+        }
+
+        /* Loading animation for button */
+        .submit-button.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .submit-button.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translateY(-50%) rotate(0deg); }
+            100% { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .form-container {
+            animation: float 8s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="form-container">
+        
+        <div class="form-header">
+            <h2>
+                {% if update %}
+                    <span></span>Update Price
+                {% else %}
+                    <span></span>Add Product
+                {% endif %}
+            </h2>
+            
+            <p class="form-subtitle">
+                {% if update %}
+                    Modify pricing information for your product
+                {% else %}
+                    Create a new product entry for your inventory
+                {% endif %}
+            </p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if update %}
+                <div class="product-info">
+                    <p>Product: {{ product.name }}</p>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" name="price" placeholder=" New Price" value="{{ product.price }}" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" step="0.01" name="production_cost" placeholder="Production Cost" value="{{ product.production_cost }}" class="form-input" required>
+                </div>
+                
+                <button type="submit" class="submit-button">
+                    <span>Update Product</span>
+                </button>
+            {% else %}
+                <div class="form-group">
+                    <input type="text" name="name" placeholder=" Product Name" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="number" placeholder=" Product Number" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" accept="image/*" class="file-input" id="imageInput" required>
+                        <label for="imageInput" class="file-input-label">
+                            <span class="file-icon">📸</span>
+                            <span id="fileName">Choose Product Image</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" name="quantity" placeholder=" Quantity" class="form-input" required>
+                </div>
+                <div class="form-group">
+                <label for="instock">In Stock:</label>
+                <input type="number" name="instock" id="instock" min="0" required>
+                </div>
+               
+
+                <div class="form-group">
+                    <input type="number" step="0.01" name="production_cost" placeholder=" Production Cost" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" step="0.01" name="price" placeholder=" Price" class="form-input" required>
+                </div>
+                
+                <button type="submit" class="submit-button">
+                    <span>Add Product</span>
+                </button>
+                <a class="cart-link " href="javascript:history.back()" 
+    style="text-decoration: none;  color: #f8f9fa; padding: 16px; display: flex; ">← Go Back</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <script>
+        // File input enhancement
+        const fileInput = document.getElementById('imageInput');
+        const fileName = document.getElementById('fileName');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    fileName.textContent = `📁 ${file.name}`;
+                    fileName.style.color = '#4caf50';
+                } else {
+                    fileName.textContent = 'Choose Product Image';
+                    fileName.style.color = '';
+                }
+            });
+        }
+
+        // Form validation and visual feedback
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.style.background = 'rgba(255, 255, 255, 1)';
+                    this.style.borderColor = 'rgba(76, 175, 80, 0.6)';
+                } else {
+                    this.style.background = 'rgba(255, 255, 255, 0.9)';
+                    this.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }
+            });
+
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Submit button loading animation
+        const submitButton = document.querySelector('.submit-button');
+        const form = document.querySelector('form');
+        
+        form.addEventListener('submit', function() {
+            submitButton.classList.add('loading');
+            submitButton.querySelector('span').textContent = 'Processing...';
+        });
+
+        // Number input validation
+        const numberInputs = document.querySelectorAll('input[type="number"]');
+        numberInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) {
+                    this.style.borderColor = 'rgba(244, 67, 54, 0.6)';
+                    this.style.background = 'rgba(255, 235, 238, 0.9)';
+                } else if (this.value !== '') {
+                    this.style.borderColor = 'rgba(76, 175, 80, 0.6)';
+                    this.style.background = 'rgba(232, 245, 233, 0.9)';
+                }
+            });
+        });
+
+        // Smooth scrolling for mobile
+        if (window.innerWidth <= 580) {
+            document.body.style.padding = '16px';
+        }
+
+        // Dynamic pricing calculation preview (for demonstration)
+        const priceInput = document.querySelector('input[name="price"]');
+        const costInput = document.querySelector('input[name="production_cost"]');
+        
+        if (priceInput && costInput) {
+            [priceInput, costInput].forEach(input => {
+                input.addEventListener('input', updateMarginPreview);
+            });
+        }
+        
+        function updateMarginPreview() {
+            const price = parseFloat(priceInput.value) || 0;
+            const cost = parseFloat(costInput.value) || 0;
+            const margin = price > 0 && cost > 0 ? ((price - cost) / price * 100).toFixed(1) : 0;
+            
+            // Add subtle visual feedback for profit margin
+            if (margin > 30) {
+                priceInput.style.boxShadow = '0 0 0 2px rgba(76, 175, 80, 0.3)';
+            } else if (margin > 15) {
+                priceInput.style.boxShadow = '0 0 0 2px rgba(255, 193, 7, 0.3)';
+            } else if (margin > 0) {
+                priceInput.style.boxShadow = '0 0 0 2px rgba(255, 87, 34, 0.3)';
+            }
+        }
+    </script>
+</body>
+</html>

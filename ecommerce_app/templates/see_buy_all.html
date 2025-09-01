@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS - Purchase History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f9f3ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .pos-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .pos-header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pos-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .pos-header .header-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .pos-header .date-time {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .pos-header .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .pos-content {
+            padding: 30px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .content-header h2 {
+            font-size: 28px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-card .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Session Cards */
+        .session-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .session-header {
+            background: #34495e;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .session-date {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .details-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .details-btn:hover {
+            background: #2980b9;
+        }
+
+        /* Purchase Table */
+        .purchase-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .purchase-table th {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #bdc3c7;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .purchase-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 14px;
+        }
+
+        .purchase-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .purchase-table td:nth-child(2),
+        .purchase-table td:nth-child(3),
+        .purchase-table td:nth-child(4),
+        .purchase-table th:nth-child(2),
+        .purchase-table th:nth-child(3),
+        .purchase-table th:nth-child(4) {
+            text-align: right;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .price {
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .total-price {
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 15px;
+        }
+
+        /* Session Total */
+        .session-total {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .start-shopping-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .start-shopping-btn:hover {
+            background: #2980b9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .pos-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .summary-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .stat-card {
+                flex: 1;
+                min-width: auto;
+            }
+
+            .session-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .purchase-table {
+                font-size: 12px;
+            }
+
+            .purchase-table th,
+            .purchase-table td {
+                padding: 8px 6px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .pos-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .details-btn, .start-shopping-btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pos-container">
+        <!-- POS Header -->
+        <div class="pos-header">
+            <h1> SR ELECTRONICS </h1>
+            <div class="header-info">
+                <div class="date-time"> Today</div>
+                
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="pos-content">
+            <div class="content-header">
+                <h2>Purchase History</h2>
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <span class="number">{{ sessions|length|default:"0" }}</span>
+                        <span class="label">Total Orders</span>
+                    </div>
+                    
+                </div>
+            </div>
+
+            {% if sessions %}
+                {% for session in sessions %}
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-date">
+                             {{ session.created_at|date:"d M Y" }}
+                        </div>
+                        <a href="{% url 'purchase_details' session.id %}">
+                            <button class="details-btn">Cash Memo</button>
+                        </a>
+                    </div>
+                    
+                    <table class="purchase-table">
+                        <thead>
+                            <tr>
+                                <th> Product</th>
+                                <th> Price</th>
+                                <th> Qty</th>
+                                <th> Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in session.orders.all %}
+                            <tr>
+                                <td class="product-name">{{ order.product_name }}</td>
+                                <td class="price">{{ order.product_price }} Tk.</td>
+                                <td>{{ order.quantity }}</td>
+                                <td class="total-price">{{ order.total_price }} Tk.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                    
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="icon"></div>
+                    <h3>No Purchase History</h3>
+                    <p>You haven't made any purchases yet.</p>
+                    <a href="{% url 'all_products' %}"><button class="start-shopping-btn">Start Shopping</button></a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS - Shopping Cart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fcfcfc 0%, #ececec 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .pos-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .pos-header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pos-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .status-badge {
+            background: #27ae60;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cart-count {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .pos-content {
+            padding: 30px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .content-header h2 {
+            font-size: 28px;
+            color: #2c3e50;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .clear-cart-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .clear-cart-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Cart Table */
+        .cart-table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cart-table th {
+            background: #34495e;
+            color: white;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cart-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 15px;
+        }
+
+        .cart-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .cart-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cart-table td:nth-child(2),
+        .cart-table td:nth-child(3),
+        .cart-table th:nth-child(2),
+        .cart-table th:nth-child(3) {
+            text-align: center;
+        }
+
+        .cart-table td:nth-child(4),
+        .cart-table th:nth-child(4) {
+            text-align: right;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .quantity-badge {
+            background: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .subtotal {
+            font-weight: 600;
+            color: #27ae60;
+            font-size: 16px;
+        }
+
+        /* Total Section */
+        .total-section {
+            background: #ecf0f1;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .total-breakdown {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #bdc3c7;
+        }
+
+        .total-label {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+
+        .total-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .grand-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grand-total .label {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .grand-total .amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        /* Action Buttons */
+        .action-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+        }
+
+        /* Empty Cart State */
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-cart .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-cart h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+
+        .empty-cart p {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .pos-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .cart-table {
+                font-size: 13px;
+            }
+
+            .cart-table th,
+            .cart-table td {
+                padding: 10px 8px;
+            }
+
+            .action-section {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+
+            .total-section {
+                padding: 20px;
+            }
+
+            .grand-total .label {
+                font-size: 18px;
+            }
+
+            .grand-total .amount {
+                font-size: 20px;
+            }
+        }
+        .cart-link:hover{
+         
+            color: white;
+            text-decoration: underline;
+            border-bottom: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+   
+    <div class="pos-container">
+        <!-- POS Header -->
+        <div class="pos-header">
+            <h1>SR ELECTRONICS</h1>
+            <div class="header-info">
+                <div class="status-badge">Active Session</div>
+
+                <div class="cart-count">{{ items|length|default:"0" }}</div>
+                 <a class="cart-link" href="javascript:history.back()" 
+    style="text-decoration: none;  color: #f8f9fa; padding: 4px 8px;">← Go Back</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="pos-content">
+            <div class="content-header">
+                <h2> Cart</h2>
+                
+            </div>
+
+    
+            {% if items %}
+                <!-- Cart Items Table -->
+                <div class="cart-table-container">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th> Product</th>
+                                <th> Quantity</th>
+                                <th> Price</th>
+                                <th> Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="product-name">{{ item.product.name }}</td>
+                                <td><span class="quantity-badge">{{ item.quantity }}</span></td>
+                                <td class="subtotal">{{ item.product.price|default:"0.00" }} Tk.</td>
+                                <td class="subtotal">{{ item.subtotal }} TK.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Total Section -->
+                <div class="total-section">
+                    <div class="total-breakdown">
+                        <span class="total-label">Items in Cart:</span>
+                        <span class="total-value">{{ items|length }} item{{ items|length|pluralize }}</span>
+                    </div>
+                    <div class="grand-total">
+                        <span class="label"> Grand Total:</span>
+                        <span class="amount">{{ total }} Tk.</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-section">
+                    <a href="{% url 'buy_all' %}" class="action-btn btn-primary">
+                        Proceed to Checkout
+                    </a>
+                   
+                </div>
+
+            {% else %}
+                <!-- Empty Cart State -->
+                <div class="empty-cart">
+                    <div class="icon"></div>
+                    <h3>Your Cart is Empty</h3>
+                    <p>Add some products to get started with your purchase.</p>
+                    <a href="{% url 'all_products' %}"><button class="action-btn btn-primary">Browse Products</button></a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
