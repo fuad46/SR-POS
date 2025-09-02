@@ -257,9 +257,11 @@
         <a href="{% url 'all_products' %}">products</a>
 
         {% if is_admin %}
+        <a href="#" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #FFF;">ADMIN ACCOUNT ✦</a>
         <a href="{% url 'add_product' %}">Add Product</a>
          <a href="{% url 'register' %}">New Customer +</a>
          <a href="{% url 'profit' %}">Profit</a>
+         <a href="{% url 'inventory' %}">Inventory</a>
         {% endif %}
         
         <a href="{% url 'logout' %}">Logout</a>
@@ -273,7 +275,17 @@
 <div style="display:flex;flex-wrap:wrap;gap:15px;">
 {% for p in products %}
 <div style="border:1px solid #ccc;padding:10px;width:200px;">
-    <img src="{{ p.image.url }}" width="150" height="150" style="object-fit:cover;"><br><br>
+
+
+<!-- ss -->
+   {% if p.image %}
+        <img src="{{ p.image.url }}" width="150" height="150" style="object-fit:cover;"><br><br>
+    {% else %}
+        <img src="../static/images/ha.PNG" width="150" height="150" style="object-fit:cover;"><br><br>
+        <!-- 👆 fallback image stored in static folder -->
+    {% endif %}
+<!-- ss -->
+
     <strong>{{ p.name }}</strong>
     <div style="margin: 24px 20px;">
         <div>Price: {{ p.price }}</div> 

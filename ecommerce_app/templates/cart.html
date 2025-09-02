@@ -388,6 +388,7 @@
                                 <th> Quantity</th>
                                 <th> Price</th>
                                 <th> Subtotal</th>
+                               
                             </tr>
                         </thead>
                         <tbody>
@@ -397,6 +398,7 @@
                                 <td><span class="quantity-badge">{{ item.quantity }}</span></td>
                                 <td class="subtotal">{{ item.product.price|default:"0.00" }} Tk.</td>
                                 <td class="subtotal">{{ item.subtotal }} TK.</td>
+                                  
                             </tr>
                             {% endfor %}
                         </tbody>

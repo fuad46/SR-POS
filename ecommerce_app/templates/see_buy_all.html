@@ -327,6 +327,13 @@
     </style>
 </head>
 <body>
+      {% if messages %}
+  <div id="msg-box">
+    {% for message in messages %}
+      <p style="color:rgb(122, 32, 32);">{{ message }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
     <div class="pos-container">
         <!-- POS Header -->
         <div class="pos-header">
@@ -360,6 +367,8 @@
                         <a href="{% url 'purchase_details' session.id %}">
                             <button class="details-btn">Cash Memo</button>
                         </a>
+
+                        
                     </div>
                     
                     <table class="purchase-table">

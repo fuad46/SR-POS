@@ -186,7 +186,7 @@
         .price-tag {
             font-size: 24px;
             font-weight: 700;
-            color: #667eea;
+            color: #0f152e;
             margin: 15px 0;
         }
 
@@ -385,14 +385,22 @@
     </style>
 </head>
 <body>
-   
+     {% if messages %}
+  <div id="msg-box">
+    {% for message in messages %}
+      <p style="color:rgb(255, 255, 255);">{{ message }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
     <div class="header-container">
         <div class="header-content">
         <div style="display: flex; align-items: center; gap: 10px;">
             <img src="{% static 'images/ha.PNG' %}" alt="Logo" style="width: 40px; height: 40px;"> <div style="width: 60px; font-size: 12px; font-weight: 700; color: #2e2d1d;">SR Electronics <span style="color: #818181;  font-size: 10px;">Since 1980</span></div>
         </div> 
             <a href="{% url 'cart' %}" class="cart-link"> View Cart</a>
+            <a href="{% url 'home' %}" class="cart-link">Home</a>
              <a class="cart-link" href="javascript:history.back()">← Go Back</a>
+             
         </div>
     </div>
 
@@ -419,8 +427,8 @@
                 
                 <div class="product-info">
                     <h3>{{ product.name }}</h3>
-                    <div class="price-tag">${{ product.price }}</div>
-                    <div class="stock-info">✅ {{ product.quantity }} in stock</div>
+                    <div class="price-tag">{{ product.price }} Tk.</div>
+                    <div class="stock-info">✔ {{ product.instock }} in stock</div>
 
                     <!-- ✅ Quantity + Add to Cart -->
                     <form method="post" action="{% url 'add_to_cart' product.id %}">
@@ -436,7 +444,7 @@
             </div>
             {% empty %}
             <div class="empty-state">
-                <div class="icon">📦</div>
+                <div class="icon"></div>
                 <h3>No Products Found</h3>
                 <p>Try adjusting your search criteria or check back later for new products.</p>
             </div>

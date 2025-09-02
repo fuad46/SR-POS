@@ -66,22 +66,62 @@ def home(request):
 
 #     return render(request, 'add_product.html')
 
+# @login_required
+# def add_product(request):
+#     if request.method == "POST":
+#         name = request.POST.get("name")
+#         number = request.POST.get("number")
+#         price = request.POST.get("price")
+#         quantity = request.POST.get("quantity")
+#         instock = request.POST.get("instock")
+#         production_cost = request.POST.get("production_cost")
+#         image = request.FILES.get("image")
+
+#         Product.objects.create(
+#             name=name,
+#             number=number,
+#             price=price,
+#             quantity=quantity,
+#             instock=instock,
+#             production_cost=production_cost,
+#             image=image
+#         )
+
+#         messages.success(request, "✅ Product added successfully!")
+#         return redirect("add_product")  
+
+#     return render(request, "add_product.html")
+
+from django.db import IntegrityError
+
+@login_required
 def add_product(request):
     if request.method == "POST":
-        name = request.POST.get("name")
-        number = request.POST.get("number")
-        price = request.POST.get("price")
-        quantity = request.POST.get("quantity")
-        instock = request.POST.get("instock")
+        try:
+            name = request.POST.get("name")
+            number = request.POST.get("number")
+            price = request.POST.get("price")
+            quantity = request.POST.get("quantity")
+            instock = request.POST.get("instock")
+            production_cost = request.POST.get("production_cost")
+            image = request.FILES.get("image")
 
-        Product.objects.create(
-            name=name,
-            number=number,
-            price=price,
-            quantity=quantity,
-            instock=instock
-        )
-        return redirect("inventory")  # or wherever you want
+            Product.objects.create(
+                name=name,
+                number=number,
+                price=price,
+                quantity=quantity,
+                instock=instock,
+                production_cost=production_cost,
+                image=image
+            )
+            messages.success(request, "✅ Product added successfully!")
+            return redirect("add_product")
+
+        except IntegrityError:
+            messages.error(request, "❌ Product number already exists! Please choose another one.")
+            return redirect("add_product")
+
     return render(request, "add_product.html")
 
 
@@ -89,21 +129,56 @@ def add_product(request):
 def update_price(request, product_id):
     if not request.user.is_admin:
         return redirect('home')
-    product = Product.objects.get(id=product_id)
+
+    product = get_object_or_404(Product, id=product_id)
+
     if request.method == 'POST':
-        product.price = request.POST['price']
+        product.number = request.POST.get('number', product.number)
+        product.price = request.POST.get('price', product.price)
+        product.production_cost = request.POST.get('production_cost', product.production_cost)
+        product.quantity = request.POST.get('quantity', product.quantity)
+        product.instock = request.POST.get('instock', product.instock)
+
+        if request.FILES.get('image'):
+            product.image = request.FILES['image']
+
         product.save()
-        messages.success(request, "Price updated!")
+        messages.success(request, "✅ Product updated successfully!")
         return redirect('home')
+
     return render(request, 'add_product.html', {'update': True, 'product': product})
 
+
 # ✅ Add to Cart (Session-based)
+# @login_required
+# def add_to_cart(request, product_id):
+#     cart = request.session.get('cart', {})
+#     cart[str(product_id)] = cart.get(str(product_id), 0) + 1
+#     request.session['cart'] = cart
+#     return redirect('home')
+
 @login_required
 def add_to_cart(request, product_id):
     cart = request.session.get('cart', {})
-    cart[str(product_id)] = cart.get(str(product_id), 0) + 1
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        quantity = int(request.POST.get("quantity", 1))
+    else:
+        quantity = 1
+
+    # 🟢 Check if requested + existing in cart exceeds stock
+    current_in_cart = cart.get(str(product_id), 0)
+    if current_in_cart + quantity > product.instock:
+        messages.error(request, f"❌ Not enough stock for {product.name}. Available: {product.instock}")
+        return redirect('all_products')  # 👈 stays on product list
+
+    # ✅ Otherwise add safely
+    cart[str(product_id)] = current_in_cart + quantity
     request.session['cart'] = cart
-    return redirect('home')
+    messages.success(request, f"✅ Added {quantity} × {product.name} to cart")
+    return redirect('all_products')
+
 
 # ✅ View Cart
 @login_required
@@ -137,6 +212,43 @@ def view_cart(request):
 #     return redirect('home')
 
 @login_required
+# @login_required
+# def buy_all(request):
+#     cart = request.session.get('cart', {})
+#     if not cart:
+#         messages.error(request, "Cart is empty!")
+#         return redirect('home')
+
+#     session = PurchaseSession.objects.create(user=request.user)
+
+#     for pid, qty in cart.items():
+#         product = Product.objects.get(id=int(pid))
+
+       
+#         if product.instock < qty:
+#             messages.error(request, f"Not enough stock for {product.name}! Available: {product.instock}")
+#             return redirect('view_cart')
+
+       
+#         product.instock -= qty
+#         product.save()
+
+#         total_price = Decimal(product.price) * qty
+#         Order.objects.create(
+#             user=request.user,
+#             session=session,
+#             product=product,
+#             product_name=product.name,
+#             product_price=product.price,
+#             quantity=qty,
+#             total_price=total_price,
+#             confirmed=True
+#         )
+
+#     request.session['cart'] = {}
+#     messages.success(request, "Purchase successful!")
+#     return redirect('see_buy_all')
+
 @login_required
 def buy_all(request):
     cart = request.session.get('cart', {})
@@ -149,12 +261,13 @@ def buy_all(request):
     for pid, qty in cart.items():
         product = Product.objects.get(id=int(pid))
 
-        # 🟢 Check stock before purchase
+        # 🛑 If stock not enough, cancel whole session and show message
         if product.instock < qty:
-            messages.error(request, f"Not enough stock for {product.name}! Available: {product.instock}")
-            return redirect('view_cart')
+            session.delete()  # rollback empty session
+            messages.error(request, f"❌ Not enough stock for {product.name}. Available: {product.instock}")
+            return redirect('cart')
 
-        # Deduct stock
+        # ✅ Deduct stock
         product.instock -= qty
         product.save()
 
@@ -170,8 +283,9 @@ def buy_all(request):
             confirmed=True
         )
 
+    # 🧹 Clear cart only after success
     request.session['cart'] = {}
-    messages.success(request, "Purchase successful!")
+    messages.success(request, "✅ Purchase successful!")
     return redirect('see_buy_all')
 
 
@@ -290,3 +404,14 @@ from .models import Product
 def inventory(request):
     products = Product.objects.all()
     return render(request, "inventory.html", {"products": products})
+
+
+from django.shortcuts import render
+
+def error_500(request):
+    return render(request, "err.html", {
+        "message": "Oops! Something went wrong. Please contact developer."
+    }, status=500)
+
+
+

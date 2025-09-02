@@ -1,28 +1,679 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .cart-link:hover {
+            border-bottom:  1px solid #f8f9fa;
+        }
+        /* Dashboard Header */
+        .dashboard-header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #334155;
+            padding: 24px 32px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dashboard-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .dashboard-title h2 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .dashboard-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.3);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-box {
+            background: rgba(51, 65, 85, 0.6);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #e2e8f0;
+            width: 280px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .search-box::placeholder {
+            color: #94a3b8;
+        }
+
+        /* Main Content */
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .inventory-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid #334155;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid #334155;
+            background: rgba(59, 130, 246, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            background: rgba(51, 65, 85, 0.6);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #94a3b8;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-tab.active,
+        .filter-tab:hover {
+            background: #06b6d4;
+            color: #fff;
+            border-color: #06b6d4;
+        }
+
+        /* Enhanced Table */
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+        }
+
+        table th {
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            color: #f1f5f9;
+            padding: 20px 24px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        table td {
+            padding: 20px 24px;
+            border-bottom: 1px solid #334155;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        table tr {
+            transition: all 0.3s ease;
+            border: none;
+            border-left: 4px solid transparent;
+        }
+
+        table tr:hover {
+            background: rgba(6, 182, 212, 0.1);
+            border-left-color: #06b6d4;
+            transform: translateX(4px);
+        }
+
+        table tr:hover td {
+            color: #06b6d4;
+        }
+
+        /* Product name styling */
+        .product-name {
+            font-weight: 600;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .product-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Price styling */
+        .price-cell {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Quantity styling */
+        .quantity-cell {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        /* Stock status styling */
+        .stock-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stock-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .stock-high {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+
+        .stock-medium {
+            background: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+        }
+
+        .stock-low {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Stats Summary */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+            border-color: #06b6d4;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-revenue .stat-value { color: #10b981; }
+        .stat-products .stat-value { color: #3b82f6; }
+        .stat-stock .stat-value { color: #f59e0b; }
+        .stat-value .stat-value { color: #8b5cf6; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 32px;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 16px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .dashboard-content {
+                padding: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+
+            .dashboard-title h2 {
+                font-size: 24px;
+            }
+
+            table th,
+            table td {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+
+            .product-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+        }
+
+        /* Scrollbar styling */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Loading animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .inventory-card {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .stat-card {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.3s; }
+    </style>
 </head>
 <body>
-  <h2>Inventory</h2>
-<table border="1">
-  <tr>
-    <th>Product</th>
-    <th>Price</th>
-    <th>Quantity (per order)</th>
-    <th>In Stock</th>
-  </tr>
-  {% for product in products %}
-  <tr>
-    <td>{{ product.name }}</td>
-    <td>{{ product.price }}</td>
-    <td>{{ product.quantity }}</td>
-    <td>{{ product.instock }}</td>
-  </tr>
-  {% endfor %}
-</table>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="dashboard-title">
+                <div class="dashboard-icon"></div>
+                <h2>Inventory</h2>
+            </div>
+            <div class="header-actions">
+              <a class="cart-link" href="javascript:history.back()" 
+    style="text-decoration: none;  color: #f8f9fa; padding: 4px 8px;">← Go Back</a>
+                <input type="text" class="search-box" placeholder="🔍︎ Search products..." id="searchBox">
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card stat-products">
+                <div class="stat-value" id="totalProducts">0</div>
+                <div class="stat-label">Total Products</div>
+            </div>
+            <div class="stat-card stat-revenue">
+                <div class="stat-value" id="totalValue">$0</div>
+                <div class="stat-label">Total Value</div>
+            </div>
+            <div class="stat-card stat-stock">
+                <div class="stat-value" id="lowStock">0</div>
+                <div class="stat-label">Low Stock Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgPrice">$0</div>
+                <div class="stat-label">Average Price</div>
+            </div>
+        </div>
+
+        <!-- Inventory Table Card -->
+        <div class="inventory-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span style="color: #cb66ea ; border-radius: 1200px; display: flex; align-items: center; justify-content: center;">✦</span>
+                    Product Inventory
+                </h3>
+                <div class="filter-tabs">
+                    <div class="filter-tab active" data-filter="all">All</div>
+                    <div class="filter-tab" data-filter="low-stock">Low Stock</div>
+                    <div class="filter-tab" data-filter="high-value">High Value</div>
+                </div>
+            </div>
+            
+            {% if products %}
+            <div class="table-container">
+                <table border="1">
+                    <tr>
+                        <th> Product</th>
+                        <th> Price</th>
+                        <th> Quantity (per order)</th>
+                        <th> In Stock</th>
+                    </tr>
+                    {% for product in products %}
+                    <tr class="product-row" data-product-name="{{ product.name }}" data-price="{{ product.price }}" data-stock="{{ product.instock }}">
+                        <td>
+                            <div class="product-name">
+                                <div class="product-icon"><span style="color: #f7f7f7;">✓</span></div>
+                                {{ product.name }}
+                            </div>
+                        </td>
+                        <td class="price-cell">{{ product.price }} Tk.</td>
+                        <td class="quantity-cell">{{ product.quantity }}</td>
+                        <td class="stock-cell">
+                            <span class="stock-indicator" id="stock-{{ forloop.counter }}"></span>
+                            <span class="stock-value">{{ product.instock }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"></div>
+                <div class="empty-title">No Products Found</div>
+                <div class="empty-description">Your inventory will appear here once you add products.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateInventoryStats();
+            setupSearch();
+            setupFilters();
+            animateStockIndicators();
+        });
+
+        function calculateInventoryStats() {
+            const rows = document.querySelectorAll('.product-row');
+            let totalProducts = rows.length;
+            let totalValue = 0;
+            let lowStockCount = 0;
+            let totalPrice = 0;
+
+            rows.forEach(row => {
+                const price = parseFloat(row.dataset.price) || 0;
+                const stock = parseInt(row.dataset.stock) || 0;
+                
+                totalPrice += price;
+                totalValue += price * stock;
+                
+                if (stock < 10) { // Low stock threshold
+                    lowStockCount++;
+                }
+            });
+
+            const avgPrice = totalProducts > 0 ? totalPrice / totalProducts : 0;
+
+            // Update stat cards
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('totalValue').textContent =  totalValue.toLocaleString()  + ' ৳';
+            document.getElementById('lowStock').textContent = lowStockCount;
+            document.getElementById('avgPrice').textContent =  avgPrice.toFixed(2)  + ' ৳';
+        }
+
+        function animateStockIndicators() {
+            const stockCells = document.querySelectorAll('.stock-cell');
+            
+            stockCells.forEach((cell, index) => {
+                const stockValue = parseInt(cell.querySelector('.stock-value').textContent) || 0;
+                const indicator = cell.querySelector('.stock-indicator');
+                
+                if (stockValue > 50) {
+                    indicator.classList.add('stock-high');
+                } else if (stockValue > 10) {
+                    indicator.classList.add('stock-medium');
+                } else {
+                    indicator.classList.add('stock-low');
+                }
+            });
+        }
+
+        function setupSearch() {
+            const searchBox = document.getElementById('searchBox');
+            const rows = document.querySelectorAll('.product-row');
+
+            searchBox.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                rows.forEach(row => {
+                    const productName = row.dataset.productName.toLowerCase();
+                    const isVisible = productName.includes(searchTerm);
+                    
+                    row.style.display = isVisible ? '' : 'none';
+                    
+                    if (isVisible) {
+                        row.style.animation = 'slideInUp 0.3s ease-out';
+                    }
+                });
+            });
+        }
+
+        function setupFilters() {
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            const rows = document.querySelectorAll('.product-row');
+
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.dataset.filter;
+                    
+                    rows.forEach(row => {
+                        const price = parseFloat(row.dataset.price) || 0;
+                        const stock = parseInt(row.dataset.stock) || 0;
+                        let isVisible = true;
+
+                        switch(filter) {
+                            case 'low-stock':
+                                isVisible = stock < 10;
+                                break;
+                            case 'high-value':
+                                isVisible = price > 100;
+                                break;
+                            case 'all':
+                            default:
+                                isVisible = true;
+                                break;
+                        }
+
+                        row.style.display = isVisible ? '' : 'none';
+                        
+                        if (isVisible) {
+                            row.style.animation = 'slideInUp 0.4s ease-out';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Add click effects to rows
+        const productRows = document.querySelectorAll('.product-row');
+        productRows.forEach(row => {
+            row.addEventListener('click', function() {
+                productRows.forEach(r => r.classList.remove('selected-row'));
+                this.classList.add('selected-row');
+            });
+        });
+    </script>
+
+    <style>
+        /* Additional interactive styles */
+        .selected-row {
+            background: rgba(59, 130, 246, 0.2) !important;
+            border-left-color: #3b82f6 !important;
+        }
+
+        .product-row {
+            cursor: pointer;
+        }
+
+        /* Enhanced mobile responsiveness */
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .filter-tabs {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            
+            .filter-tab {
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </body>
 </html>

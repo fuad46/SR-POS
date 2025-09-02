@@ -23,4 +23,5 @@ urlpatterns = [
     path("profit/", views.profit_view, name="profit"),
     path("inventory/", views.inventory, name="inventory"),
 
+
 ]

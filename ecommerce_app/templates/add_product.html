@@ -305,10 +305,27 @@
         .form-container {
             animation: float 8s ease-in-out infinite;
         }
+        label{
+            color: white;
+            
+        }
+        .cart-link:hover {
+            background: #0480fc9d;
+        } 
+        .cart-link {
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
-    
+   {% if messages %}
+  <div id="msg-box">
+    {% for message in messages %}
+      <p style="color:rgb(255, 255, 255);">{{ message }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
     <div class="form-container">
         
         <div class="form-header">
@@ -334,16 +351,25 @@
             
             {% if update %}
                 <div class="product-info">
-                    <p>Product: {{ product.name }}</p>
-                </div>
-                
-                <div class="form-group">
-                    <input type="number" name="price" placeholder=" New Price" value="{{ product.price }}" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <input type="number" step="0.01" name="production_cost" placeholder="Production Cost" value="{{ product.production_cost }}" class="form-input" required>
-                </div>
+        <p>Product: {{ product.name }}</p>
+    </div>
+
+    
+
+    <div class="form-group">
+        <label for="instock">In Stock:</label>
+        <input type="number" name="instock" value="{{ product.instock }}" class="form-input"  required>
+    </div>
+
+    <div class="form-group">
+        <label for="price">Change Price:</label>
+        <input type="number" step="0.01" name="price" placeholder=" New Price" value="{{ product.price }}" class="form-input" required>
+    </div>
+
+    <div class="form-group">
+        <label for="price">Change Production Cost:</label>
+        <input type="number" step="0.01" name="production_cost" placeholder="Production Cost" value="{{ product.production_cost }}" class="form-input" required>
+    </div>
                 
                 <button type="submit" class="submit-button">
                     <span>Update Product</span>
@@ -359,7 +385,7 @@
                 
                 <div class="form-group">
                     <div class="file-input-wrapper">
-                        <input type="file" name="image" accept="image/*" class="file-input" id="imageInput" required>
+                        <input type="file" name="image" accept="image/*" class="file-input" id="imageInput" >
                         <label for="imageInput" class="file-input-label">
                             <span class="file-icon">📸</span>
                             <span id="fileName">Choose Product Image</span>
@@ -372,7 +398,7 @@
                 </div>
                 <div class="form-group">
                 <label for="instock">In Stock:</label>
-                <input type="number" name="instock" id="instock" min="0" required>
+                <input type="number" name="instock" id="instock" min="0" class="form-input" placeholder="Items In Store" required>
                 </div>
                
 
@@ -387,8 +413,10 @@
                 <button type="submit" class="submit-button">
                     <span>Add Product</span>
                 </button>
-                <a class="cart-link " href="javascript:history.back()" 
-    style="text-decoration: none;  color: #f8f9fa; padding: 16px; display: flex; ">← Go Back</a>
+            
+     <a class="cart-link " style="text-decoration: none;  
+     color: #f8f9fa; padding: 16px; display: flex; border: 1px solid #FFF; 
+     align-items: center; justify-content: center; margin: 8px 0;" href="{% url 'home' %}">Home</a>
             {% endif %}
         </form>
     </div>
@@ -485,6 +513,11 @@
                 priceInput.style.boxShadow = '0 0 0 2px rgba(255, 87, 34, 0.3)';
             }
         }
+
+        setTimeout(() => {
+    const box = document.getElementById("msg-box");
+    if (box) box.style.display = "none";
+  }, 3000); // hides after 3 seconds
     </script>
 </body>
 </html>

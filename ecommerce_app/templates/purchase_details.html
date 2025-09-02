@@ -218,6 +218,12 @@
            
             <a href="{% url 'see_buy_all' %}" class="btn btn-back r r1" style="background: none;">Back to Purchases</a>
              <a href="{% url 'home' %}"  class="btn btn-back r r1"  style="background: none;">Home</a> 
+             <!-- Paid Input -->
+<div style="display:inline-block; margin-left:20px; color:white;">
+    <label for="paid_amount">Paid: </label>
+    <input type="number" id="paid_amount" placeholder="Enter paid amount" style="padding:5px; width:100px;">
+</div>
+
              <button class="btn btn-print r" style="border: none;" onclick="window.print()">Print Receipt</button>
         </div>
     </div>
@@ -277,6 +283,14 @@
             <div class="total-amount">
                 Total: {{ total_price }}  Tk.
             </div>
+             <div class="total-amount">
+        Paid: <span id="paid_display">0 Tk.</span>
+    </div>
+     <div class="total-amount">
+        Due: <span id="due_display">{{ total_price }} Tk.</span>
+    </div>
+
+
         </div>
 
       
@@ -288,5 +302,27 @@
             <p>Call: 01751902395</p>
         </div>
     </div>
+   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const paidInput = document.getElementById("paid_amount");
+        const dueDisplay = document.getElementById("due_display");
+        const paidDisplay = document.getElementById("paid_display");
+        const total = parseFloat("{{ total_price|floatformat:2 }}") || 0;
+
+        paidInput.addEventListener("input", function () {
+            let paid = parseFloat(paidInput.value) || 0;
+            let due = total - paid;
+            if (due < 0) {
+                due = 0; // prevent negative due
+            }
+            
+            // Update both paid and due displays
+            paidDisplay.textContent = paid.toFixed(2) + " Tk.";
+            dueDisplay.textContent = due.toFixed(2) + " Tk.";
+        });
+    });
+</script>
+
+
 </body>
 </html>

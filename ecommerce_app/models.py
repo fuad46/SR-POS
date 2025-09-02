@@ -42,9 +42,9 @@ class User(AbstractBaseUser):
 class Product(models.Model):
     name = models.CharField(max_length=200)
     number = models.CharField(max_length=50, unique=True)
-    image = models.ImageField(upload_to='products/')
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     quantity = models.IntegerField()
-    production_cost = models.DecimalField(max_digits=10, decimal_places=2)  # new field
+    production_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True)  # new field
     price = models.DecimalField(max_digits=10, decimal_places=2)
     instock = models.PositiveIntegerField(default=0)  # NEW field for inventory tracking
     def __str__(self):
